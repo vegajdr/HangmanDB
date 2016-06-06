@@ -104,9 +104,13 @@ wordsdb = database_create
 puts "Please enter your username:"
 username = gets.chomp
 player = User.where(name: username).first_or_create!
+wordkey = Word.where(user_id: player.id).first_or_create!
+
 
 #This could be guesses table
 guessesdb = []
+wordkey.guesses = guessesdb.to_json
+binding.pry
 
 #  SCORE
 puts "You have saved #{player.wins} criminals and you have murdered #{player.losses} innocent men"
@@ -119,14 +123,27 @@ until done do
   attempts = 6
   # Word.word where user.id == player.id
   word = []
+  word = wordsdb.sample
+
+  if wordkey.attempts > 0
+    word = JSON.parse(wordkey.word)
+    attempts = wordkey.attempts
+
+
+  end
 
   board.clear
   guessesdb.clear
-  word = wordsdb.sample
+
+  wordkey.word = word.to_json
+
+
+
   board = board_create word
   solution = false
 
-  binding.pry
+
+
   puts "\nPlease type in a letter to guess the word"
   puts "(*NOTE: Type ':solve' to guess full word:)"
 
@@ -155,9 +172,11 @@ until done do
       player.losses += 1
     end
     player.save!
+    wordkey.guesses = guessesdb.to_json
+    wordkey.attempts = attempts
+    wordkey.save!
     binding.pry
   end
-  binding.pry
   # match board, word, attempts
   puts "Would you like to play again?:y/n"
   confirm = gets.chomp
