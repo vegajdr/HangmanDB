@@ -109,7 +109,6 @@ wordkey = Word.where(user_id: player.id).first_or_create!
 
 #This could be guesses table
 guessesdb = []
-wordkey.guesses = guessesdb.to_json
 binding.pry
 
 #  SCORE
@@ -125,15 +124,18 @@ until done do
   word = []
   word = wordsdb.sample
 
+  board.clear
+  guessesdb.clear
+
+
   if wordkey.attempts > 0
     word = JSON.parse(wordkey.word)
     attempts = wordkey.attempts
+    guessesdb = JSON.parse(wordkey.guesses)
 
 
   end
 
-  board.clear
-  guessesdb.clear
 
   wordkey.word = word.to_json
 
